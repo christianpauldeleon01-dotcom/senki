@@ -165,9 +165,8 @@ class _ActivityTrackingScreenState extends State<ActivityTrackingScreen> {
       if (mounted && _state == ActivityState.running) {
         final position = await _gpsService.getCurrentPosition();
         if (position != null && mounted) {
-          final newPosition = LatLng(position.latitude, position.longitude);
           setState(() {
-            _currentPosition = newPosition;
+            _currentPosition = LatLng(position.latitude, position.longitude);
             _gpsAccuracy = position.accuracy;
             _routePoints = GPSService.coordinatesToLatLng(
               _trackingService.usedCoordinates,
@@ -177,7 +176,9 @@ class _ActivityTrackingScreenState extends State<ActivityTrackingScreen> {
             _instantPace = _trackingService.formattedInstantPace;
             _currentSpeed = _trackingService.currentSpeed;
           });
-          _mapController.move(newPosition, 16);
+          if (_currentPosition != null) {
+            _mapController.move(_currentPosition!, 16);
+          }
         }
       }
     });
