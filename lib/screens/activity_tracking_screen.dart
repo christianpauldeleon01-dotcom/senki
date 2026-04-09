@@ -570,7 +570,9 @@ class _ActivityTrackingScreenState extends State<ActivityTrackingScreen> {
           label: 'Distance',
           value: '${_distance.toStringAsFixed(2)} km',
           icon: CupertinoIcons.map,
-          iconColor: NeonColors.iconOnSurface,
+          iconColor: currentThemeMode == TrakThemeMode.dark 
+              ? const Color(0xFF000000) 
+              : const Color(0xFFFFFFFF),
         ),
         Container(
           width: 1,
@@ -743,9 +745,9 @@ class _ActivityTrackingScreenState extends State<ActivityTrackingScreen> {
           ),
         ),
         
-        // Camera button
+        // Media button
         GestureDetector(
-          onTap: () => _openCamera(),
+          onTap: () => _openMediaCapture(),
           child: Container(
             width: 56,
             height: 56,
@@ -884,7 +886,7 @@ class _ActivityTrackingScreenState extends State<ActivityTrackingScreen> {
     );
   }
 
-  void _openCamera() {
+  void _openMediaCapture() {
     Navigator.of(context).push(
       CupertinoPageRoute(
         builder: (context) => ActivityPhotoScreen(

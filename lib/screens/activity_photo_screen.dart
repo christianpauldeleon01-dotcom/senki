@@ -10,7 +10,6 @@ import 'package:path_provider/path_provider.dart';
 import '../services/gps_service.dart';
 import '../services/activity_service.dart';
 
-/// Activity Photo Screen - Take photo with Strava-style overlay
 class ActivityPhotoScreen extends StatefulWidget {
   final double distance;
   final String duration;
@@ -36,21 +35,11 @@ class _ActivityPhotoScreenState extends State<ActivityPhotoScreen> {
   bool _isCapturing = false;
   bool _showOverlay = true;
 
-  // Overlay position and scale
   double _overlayX = 20;
   double _overlayY = 20;
   double _overlayScale = 1.0;
   
-  // Camera settings
-  final double _currentZoom = 1.0;
-  bool _enableFlash = false;
-  
-  // Route coordinates for mini map
   List<LatLng> _routePoints = [];
-  
-  // Overlay color customization
-  final Color _overlayColor = CupertinoColors.black;
-  final Color _accentColor = CupertinoColors.systemOrange;
 
   @override
   void initState() {
@@ -99,7 +88,6 @@ class _ActivityPhotoScreenState extends State<ActivityPhotoScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // Header with activity summary
           Container(
             padding: const EdgeInsets.all(20),
             margin: const EdgeInsets.symmetric(horizontal: 32),
@@ -141,11 +129,9 @@ class _ActivityPhotoScreenState extends State<ActivityPhotoScreen> {
           ),
           const SizedBox(height: 32),
           
-          // Camera controls
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Main camera button
               _buildImagePickerButton(
                 icon: CupertinoIcons.camera_fill,
                 label: 'Camera',
@@ -157,7 +143,6 @@ class _ActivityPhotoScreenState extends State<ActivityPhotoScreen> {
           
           const SizedBox(height: 24),
           
-          // Gallery button
           CupertinoButton(
             onPressed: () => _pickImage(ImageSource.gallery),
             child: Row(
@@ -175,7 +160,6 @@ class _ActivityPhotoScreenState extends State<ActivityPhotoScreen> {
           
           const SizedBox(height: 16),
           
-          // Skip button
           CupertinoButton(
             onPressed: () => Navigator.of(context).pop(null),
             child: Text(
@@ -210,52 +194,6 @@ class _ActivityPhotoScreenState extends State<ActivityPhotoScreen> {
         ),
       ],
     );
-  }
-
-  Widget _buildCameraControl({
-    required IconData icon,
-    required String label,
-    required VoidCallback onTap,
-    bool isActive = false,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        children: [
-          Container(
-            width: 50,
-            height: 50,
-            decoration: BoxDecoration(
-              color: isActive 
-                  ? CupertinoColors.systemOrange.withValues(alpha: 0.2)
-                  : CupertinoColors.systemGrey5.resolveFrom(context),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              icon,
-              color: isActive 
-                  ? CupertinoColors.systemOrange 
-                  : CupertinoColors.systemGrey,
-              size: 24,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 11,
-              color: CupertinoColors.secondaryLabel.resolveFrom(context),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _toggleFlash() {
-    setState(() {
-      _enableFlash = !_enableFlash;
-    });
   }
 
   Widget _buildImagePickerButton({
@@ -322,20 +260,16 @@ class _ActivityPhotoScreenState extends State<ActivityPhotoScreen> {
   Widget _buildPhotoEditor() {
     return Column(
       children: [
-        // Photo with overlay
         Expanded(
           child: RepaintBoundary(
             key: _captureKey,
             child: Stack(
               fit: StackFit.expand,
               children: [
-                // Image
                 Image.file(
                   _imageFile!,
                   fit: BoxFit.cover,
                 ),
-
-                // Strava-style overlay (draggable)
                 if (_showOverlay)
                   Positioned(
                     left: _overlayX,
@@ -357,8 +291,6 @@ class _ActivityPhotoScreenState extends State<ActivityPhotoScreen> {
             ),
           ),
         ),
-
-        // Bottom controls
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
@@ -369,7 +301,6 @@ class _ActivityPhotoScreenState extends State<ActivityPhotoScreen> {
           ),
           child: Column(
             children: [
-              // Scale slider
               Row(
                 children: [
                   const Icon(
@@ -393,7 +324,6 @@ class _ActivityPhotoScreenState extends State<ActivityPhotoScreen> {
                 ],
               ),
               const SizedBox(height: 12),
-              // Action buttons
               Row(
                 children: [
                   Expanded(
@@ -435,14 +365,13 @@ class _ActivityPhotoScreenState extends State<ActivityPhotoScreen> {
       width: 180,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: CupertinoColors.black.withOpacity(0.75),
+        color: CupertinoColors.black.withValues(alpha: 0.75),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Distance
           Row(
             children: [
               const Icon(
@@ -462,8 +391,6 @@ class _ActivityPhotoScreenState extends State<ActivityPhotoScreen> {
             ],
           ),
           const SizedBox(height: 8),
-
-          // Duration
           Row(
             children: [
               const Icon(
@@ -482,8 +409,6 @@ class _ActivityPhotoScreenState extends State<ActivityPhotoScreen> {
             ],
           ),
           const SizedBox(height: 4),
-
-          // Pace
           Row(
             children: [
               const Icon(
@@ -502,8 +427,6 @@ class _ActivityPhotoScreenState extends State<ActivityPhotoScreen> {
             ],
           ),
           const SizedBox(height: 12),
-
-          // Route polyline (no map)
           if (_routePoints.isNotEmpty)
             SizedBox(
               height: 60,
@@ -522,7 +445,6 @@ class _ActivityPhotoScreenState extends State<ActivityPhotoScreen> {
 
   Future<void> _pickImage(ImageSource source) async {
     try {
-      // Camera-specific options
       final XFile? image = await _picker.pickImage(
         source: source,
         maxWidth: 1920,
@@ -536,7 +458,7 @@ class _ActivityPhotoScreenState extends State<ActivityPhotoScreen> {
         });
       }
     } catch (e) {
-      // Handle error silently - user might have cancelled
+      // Handle error silently
     }
   }
 
@@ -575,7 +497,6 @@ class _ActivityPhotoScreenState extends State<ActivityPhotoScreen> {
     });
 
     try {
-      // Capture the widget with overlay
       final boundary = _captureKey.currentContext?.findRenderObject()
           as RenderRepaintBoundary?;
       if (boundary == null) {
@@ -596,21 +517,18 @@ class _ActivityPhotoScreenState extends State<ActivityPhotoScreen> {
 
       final Uint8List pngBytes = byteData.buffer.asUint8List();
 
-      // Save to app documents directory first
       final directory = await getApplicationDocumentsDirectory();
       final fileName =
           'activity_photo_${DateTime.now().millisecondsSinceEpoch}.png';
       final file = File('${directory.path}/$fileName');
       await file.writeAsBytes(pngBytes);
 
-      // Save to device gallery using Gal
       await Gal.putImage(file.path);
 
       setState(() {
         _isCapturing = false;
       });
 
-      // Show success message
       if (mounted) {
         _showSaveSuccessDialog();
       }
@@ -624,7 +542,6 @@ class _ActivityPhotoScreenState extends State<ActivityPhotoScreen> {
   Future<void> _savePhoto() async {
     if (_imageFile == null) return;
 
-    // Just save the original image without overlay
     final directory = await getApplicationDocumentsDirectory();
     final fileName =
         'activity_photo_${DateTime.now().millisecondsSinceEpoch}.jpg';
@@ -636,7 +553,6 @@ class _ActivityPhotoScreenState extends State<ActivityPhotoScreen> {
   }
 }
 
-/// Custom painter for drawing just the polyline route (no map)
 class _RoutePolylinePainter extends CustomPainter {
   final List<LatLng> points;
   final Color color;
@@ -650,7 +566,6 @@ class _RoutePolylinePainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     if (points.isEmpty) return;
 
-    // Find bounds
     double minLat = double.infinity;
     double maxLat = double.negativeInfinity;
     double minLng = double.infinity;
@@ -663,7 +578,6 @@ class _RoutePolylinePainter extends CustomPainter {
       maxLng = point.longitude > maxLng ? point.longitude : maxLng;
     }
 
-    // Add padding
     final latPadding = (maxLat - minLat) * 0.1;
     final lngPadding = (maxLng - minLng) * 0.1;
     minLat -= latPadding;
@@ -671,7 +585,6 @@ class _RoutePolylinePainter extends CustomPainter {
     minLng -= lngPadding;
     maxLng += lngPadding;
 
-    // Ensure we don't have zero range
     if (maxLat == minLat) {
       maxLat += 0.001;
       minLat -= 0.001;
@@ -681,14 +594,12 @@ class _RoutePolylinePainter extends CustomPainter {
       minLng -= 0.001;
     }
 
-    // Normalize points to canvas coordinates
     final latRange = maxLat - minLat;
     final lngRange = maxLng - minLng;
     
-    // Handle edge cases where range is zero or invalid
     if (latRange == 0 || latRange.isNaN || latRange.isInfinite ||
         lngRange == 0 || lngRange.isNaN || lngRange.isInfinite) {
-      return; // Cannot normalize points, skip drawing
+      return;
     }
     
     final normalizedPoints = points.map((point) {
@@ -697,7 +608,6 @@ class _RoutePolylinePainter extends CustomPainter {
       return Offset(x, y);
     }).toList();
 
-    // Draw the route line
     if (normalizedPoints.length > 1) {
       final paint = Paint()
         ..color = color
@@ -716,7 +626,6 @@ class _RoutePolylinePainter extends CustomPainter {
       canvas.drawPath(path, paint);
     }
 
-    // Draw start marker
     if (normalizedPoints.isNotEmpty) {
       final startPaint = Paint()
         ..color = color
@@ -725,7 +634,6 @@ class _RoutePolylinePainter extends CustomPainter {
       canvas.drawCircle(normalizedPoints.first, 6, startPaint);
     }
 
-    // Draw end marker
     if (normalizedPoints.length > 1) {
       final endPaint = Paint()
         ..color = CupertinoColors.systemOrange
