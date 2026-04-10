@@ -897,20 +897,24 @@ class _ActivityTrackingScreenState extends State<ActivityTrackingScreen> {
         ),
       ),
     ).then((result) {
+      if (!mounted) return;
+      
       if (result != null) {
         _trackingService.discardActivity();
       } else {
         _trackingService.resumeActivity();
       }
-      setState(() {
-        _duration = '00:00';
-        _distance = 0.0;
-        _averagePace = '--:--';
-        _instantPace = '--:--';
-        _routePoints = [];
-        _currentSpeed = 0;
-        _currentSplit = 0;
-      });
+      if (mounted) {
+        setState(() {
+          _duration = '00:00';
+          _distance = 0.0;
+          _averagePace = '--:--';
+          _instantPace = '--:--';
+          _routePoints = [];
+          _currentSpeed = 0;
+          _currentSplit = 0;
+        });
+      }
     });
   }
 }

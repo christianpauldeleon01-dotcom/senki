@@ -472,25 +472,6 @@ class _ActivityPhotoScreenState extends State<ActivityPhotoScreen> {
     });
   }
 
-  void _showSaveSuccessDialog() {
-    showCupertinoDialog(
-      context: context,
-      builder: (context) => CupertinoAlertDialog(
-        title: const Text('Photo Saved'),
-        content: const Text('Your activity photo has been saved to the gallery!'),
-        actions: [
-          CupertinoDialogAction(
-            child: const Text('Continue'),
-            onPressed: () {
-              Navigator.of(context).pop();
-              Navigator.of(context).pop(null);
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
   Future<void> _saveWithOverlay() async {
     if (!mounted) return;
     
@@ -545,12 +526,13 @@ class _ActivityPhotoScreenState extends State<ActivityPhotoScreen> {
   }
 
   Future<void> _savePhoto() async {
-    if (_imageFile == null) return;
+    if (_imageFile == null || !mounted) return;
 
-    final directory = await getApplicationDocumentsDirectory();
-    final fileName =
-        'activity_photo_${DateTime.now().millisecondsSinceEpoch}.jpg';
-    await _imageFile!.copy('${directory.path}/$fileName');
+    try {
+      final directory = await getApplicationDocumentsDirectory();
+      final fileName = 'activity_photo_${DateTime.now().millisecondsSinceEpoch}.jpg';
+      await _imageFile!.copy('${directory.path}/$fileName');
+    } catch (_) {}
 
     if (mounted) {
       Navigator.of(context).pop('saved');
